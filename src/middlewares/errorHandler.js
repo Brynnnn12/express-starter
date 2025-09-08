@@ -17,12 +17,12 @@ exports.notFound = (req, res, next) => {
  * jika di development, stack trace ditampilkan
  * untuk memudahkan debugging
  */
+
 exports.errorHandler = (err, req, res, next) => {
   const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
-  res.status(statusCode);
-  res.json({
+  res.status(statusCode).json({
     status: "error",
-    message: err.message,
+    message: err.message || "Terjadi kesalahan di server",
     stack: process.env.NODE_ENV === "production" ? null : err.stack,
   });
 };

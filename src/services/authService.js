@@ -7,6 +7,11 @@ const {
   verifyRefreshToken,
 } = require("../utils/generateToken");
 const { sendEmail } = require("../utils/sendEmail");
+const {
+  createVerificationEmailTemplate,
+  createPasswordResetTemplate,
+  createWelcomeEmailTemplate,
+} = require("../templates/emailTemplate");
 
 exports.register = asyncHandler(
   async ({ name, email, password, passwordConfirmation }) => {
@@ -22,14 +27,21 @@ exports.register = asyncHandler(
 
     const token = generateAccessToken({ id: user.id, email: user.email });
 
-    const verifyUrl = `${process.env.APP_URL}/api/auth/verify-email?token=${token}`;
+    const verifyUrl = `${
+      process.env.APP_URL || "http://localhost:3000"
+    }/api/auth/verify-email?token=${token}`;
     console.log(`Verifikasi email: ${verifyUrl}`);
+
+    const htmlTemplate = createVerificationEmailTemplate({
+      userName: user.name,
+      verificationUrl: verifyUrl,
+    });
 
     await sendEmail({
       to: user.email,
-      subject: "Verifikasi Email Anda",
-      text: `Klik link berikut untuk verifikasi email Anda: ${verifyUrl}`,
-      html: `<p>Klik link berikut untuk verifikasi email Anda:</p><a href="${verifyUrl}">${verifyUrl}</a>`,
+      subject: "Verifikasi Email Anda - Express Starter App",
+      text: `Halo ${user.name}, klik link berikut untuk verifikasi email Anda: ${verifyUrl}`,
+      html: htmlTemplate,
     });
 
     return user;
@@ -71,6 +83,19 @@ exports.verifyEmail = asyncHandler(async (token) => {
   user.emailVerifiedAt = new Date();
   await user.save();
 
+  // Kirim welcome email setelah verifikasi berhasil
+  const welcomeTemplate = createWelcomeEmailTemplate({
+    userName: user.name,
+    dashboardUrl: `${process.env.APP_URL || "http://localhost:3000"}/dashboard`,
+  });
+
+  await sendEmail({
+    to: user.email,
+    subject: "Selamat Datang di Express Starter App! 🎉",
+    text: `Halo ${user.name}, selamat datang! Email Anda telah berhasil diverifikasi.`,
+    html: welcomeTemplate,
+  });
+
   return user;
 });
 
@@ -81,35 +106,56 @@ exports.forgotPassword = asyncHandler(async (email) => {
   }
 
   const token = generateAccessToken({ id: user.id, email: user.email });
-  const resetUrl = `${process.env.APP_URL}/api/auth/reset-password?token=${token}`;
+  const resetUrl = `${
+    process.env.APP_URL || "http://localhost:3000"
+  }/api/auth/reset-password?token=${token}`;
   console.log(`Reset password: ${resetUrl}`);
+
+  const htmlTemplate = createPasswordResetTemplate({
+    userName: user.name,
+    resetUrl: resetUrl,
+  });
 
   await sendEmail({
     to: user.email,
-    subject: "Reset Password Anda",
-    text: `Klik link berikut untuk mereset password Anda: ${resetUrl}`,
-    html: `<p>Klik link berikut untuk mereset password Anda:</p><a href="${resetUrl}">${resetUrl}</a>`,
+    subject: "Reset Password Anda - Express Starter App",
+    text: `Halo ${user.name}, klik link berikut untuk mereset password Anda: ${resetUrl}`,
+    html: htmlTemplate,
   });
 
   return;
 });
 
 exports.resetPassword = asyncHandler(
-  async (token, newPassword, newPasswordConfirmation) => {
-    if (newPassword !== newPasswordConfirmation) {
+  async (token, password, passwordConfirmation) => {
+    if (password !== passwordConfirmation) {
       throw new Error("Password dan konfirmasi password tidak cocok");
     }
+
+    // console.log("Reset Password - Token received:", token ? "Yes" : "No");
+
     const decoded = verifyAccessToken(token);
+    // console.log(
+    //   "Reset Password - Token decoded:",
+    //   decoded ? "Success" : "Failed"
+    // );
 
     if (!decoded) {
-      throw new Error("Token tidak valid");
+      throw new Error("Token tidak valid atau sudah kedaluwarsa");
     }
+
     const user = await User.findByPk(decoded.id);
     if (!user) {
       throw new Error("User tidak ditemukan");
     }
-    user.password = newPassword;
+
+    // console.log("Reset Password - User found:", user.email);
+
+    user.password = password;
     await user.save();
+
+    // console.log("Reset Password - Password updated for:", user.email);
+
     return user;
   }
 );

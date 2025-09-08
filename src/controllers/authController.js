@@ -50,8 +50,14 @@ exports.forgotPassword = asyncHandler(async (req, res) => {
 });
 
 exports.resetPassword = asyncHandler(async (req, res) => {
-  const { token, newPassword, passwordConfirmation } = req.body;
-  const user = await resetPassword(token, newPassword, passwordConfirmation);
+  const token = req.body.token || req.query.token;
+  const { password, passwordConfirmation } = req.body;
+
+  if (!token) {
+    throw new Error("Token reset password diperlukan");
+  }
+
+  const user = await resetPassword(token, password, passwordConfirmation);
   responseSuccess(res, 200, "Password berhasil direset", { user });
 });
 

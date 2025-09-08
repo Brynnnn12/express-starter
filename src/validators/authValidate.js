@@ -1,4 +1,4 @@
-const { body, validationResult } = require("express-validator");
+const { body, query, validationResult } = require("express-validator");
 
 exports.validateRegistration = [
   body("name")
@@ -63,6 +63,15 @@ exports.validateForgotPassword = [
 ];
 
 exports.validateResetPassword = [
+  // Token bisa datang dari body atau query parameter
+  body("token")
+    .optional()
+    .notEmpty()
+    .withMessage("Token reset password harus diisi"),
+  query("token")
+    .optional()
+    .notEmpty()
+    .withMessage("Token reset password harus diisi"),
   body("password")
     .notEmpty()
     .withMessage("Password harus diisi")
@@ -75,6 +84,20 @@ exports.validateResetPassword = [
     .withMessage("Password dan konfirmasi password tidak cocok"),
   (req, res, next) => {
     const errors = validationResult(req);
+
+    // Custom validation untuk memastikan token ada di salah satu tempat
+    if (!req.body.token && !req.query.token) {
+      return res.status(400).json({
+        errors: [
+          {
+            msg: "Token reset password diperlukan (dalam body atau query parameter)",
+            param: "token",
+            location: "body",
+          },
+        ],
+      });
+    }
+
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
