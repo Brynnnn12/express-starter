@@ -12,6 +12,7 @@ const authRoute = require("./routes/authRoute");
 
 // Middlewares
 const { notFound, errorHandler } = require("./middlewares/errorHandler");
+const morganMiddleware = require("./config/morgan");
 
 // Initialize app
 const app = express();
@@ -27,7 +28,7 @@ app.use(helmet());
 app.use(cors());
 
 // Logging middleware
-app.use(morgan("combined"));
+app.use(morganMiddleware);
 
 // Untuk parsing middleware dan body request yang besar ukuran 10mb
 app.use(express.json({ limit: "10mb" }));
