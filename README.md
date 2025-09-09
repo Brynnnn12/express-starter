@@ -878,7 +878,7 @@ Proyek ini dilisensikan di bawah **brynnnn12 License**.
 ```
 MIT License
 
-Copyright (c) 2025 Bryan Kurnia
+Copyright (c) 2025 Bryan Kurnia Akbar
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -904,15 +904,14 @@ SOFTWARE.
 <div align="center">
   <img src="https://github.com/Brynnnn12.png" alt="Bryan Kurnia" width="100" height="100" style="border-radius: 50%;">
   
-  **Bryan Kurnia**
-  
-  *Full Stack Developer & Backend Specialist*
+  **Bryan Kurnia Akbar**
+
 </div>
 
 - 🌐 **GitHub**: [@Brynnnn12](https://github.com/Brynnnn12)
-- 📧 **Email**: bryankurnia@example.com
-- 💼 **LinkedIn**: [Bryan Kurnia](https://linkedin.com/in/bryan-kurnia)
-- 🐦 **Twitter**: [@brynnnn12](https://twitter.com/brynnnn12)
+- 📧 **Email**: bryankurniaakbar12@gmail.com
+- 💼 **LinkedIn**: [Bryan Kurnia](https://linkedin.com/in/brynnnn12)
+- 🐦 **Instagram**: [@brynnnn12](https://instagram.com/brynnnn12)
 
 ## 🙏 **Acknowledgments**
 
