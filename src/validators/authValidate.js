@@ -2,10 +2,16 @@ const { body, query, validationResult } = require("express-validator");
 
 exports.validateRegistration = [
   body("name")
+    .trim()
+    .escape()
     .notEmpty()
     .withMessage("Nama harus diisi")
     .isLength({ min: 3 })
-    .withMessage("Nama harus memiliki minimal 3 karakter"),
+    .withMessage("Nama harus memiliki minimal 3 karakter")
+    .matches(/^[a-zA-Z0-9\s.'-]+$/)
+    .withMessage(
+      "Nama hanya boleh huruf, angka, spasi, titik, apostrof, dan strip"
+    ),
   body("email")
     .notEmpty()
     .withMessage("Email harus diisi")
@@ -15,7 +21,11 @@ exports.validateRegistration = [
     .notEmpty()
     .withMessage("Password harus diisi")
     .isLength({ min: 6 })
-    .withMessage("Password harus memiliki minimal 6 karakter"),
+    .withMessage("Password harus memiliki minimal 6 karakter")
+    .matches(/^[^\s<>"]+$/)
+    .withMessage(
+      "Password tidak boleh mengandung spasi atau karakter berbahaya"
+    ),
   body("passwordConfirmation")
     .notEmpty()
     .withMessage("Konfirmasi password harus diisi")
@@ -37,7 +47,13 @@ exports.validateLogin = [
     .withMessage("Email harus diisi")
     .isEmail()
     .withMessage("Email tidak valid"),
-  body("password").notEmpty().withMessage("Password harus diisi"),
+  body("password")
+    .notEmpty()
+    .withMessage("Password harus diisi")
+    .matches(/^[^\s<>"]+$/)
+    .withMessage(
+      "Password tidak boleh mengandung spasi atau karakter berbahaya"
+    ),
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -49,6 +65,8 @@ exports.validateLogin = [
 
 exports.validateForgotPassword = [
   body("email")
+    .trim()
+    .normalizeEmail()
     .notEmpty()
     .withMessage("Email harus diisi")
     .isEmail()
@@ -76,7 +94,11 @@ exports.validateResetPassword = [
     .notEmpty()
     .withMessage("Password harus diisi")
     .isLength({ min: 6 })
-    .withMessage("Password harus memiliki minimal 6 karakter"),
+    .withMessage("Password harus memiliki minimal 6 karakter")
+    .matches(/^[^\s<>"]+$/)
+    .withMessage(
+      "Password tidak boleh mengandung spasi atau karakter berbahaya"
+    ),
   body("passwordConfirmation")
     .notEmpty()
     .withMessage("Konfirmasi password harus diisi")

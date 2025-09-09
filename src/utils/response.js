@@ -10,7 +10,7 @@ exports.responseSuccess = (
   res,
   statusCode = 200,
   message = "Success",
-  data
+  data = null
 ) => {
   return res.status(statusCode).json({
     status: "success",
