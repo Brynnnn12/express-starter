@@ -1,6 +1,10 @@
-const dotenv = require("dotenv");
-dotenv.config();
+require("dotenv").config();
 
+/**
+ * Konfigurasi JWT
+ * Menggunakan environment variables untuk fleksibilitas
+ * Pastikan variabel lingkungan sudah diatur di file .env
+ */
 module.exports = {
   access: {
     secret: process.env.JWT_SECRET,

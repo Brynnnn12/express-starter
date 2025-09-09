@@ -29,7 +29,7 @@ exports.authenticateToken = async (req, res, next) => {
       include: [
         {
           model: Role,
-          through: { attributes: [] }, // Exclude pivot table attributes
+          through: { attributes: ["name"] },
         },
       ],
     });

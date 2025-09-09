@@ -61,7 +61,7 @@ exports.login = asyncHandler(async ({ email, password }) => {
     include: [
       {
         model: Role,
-        through: { attributes: [] }, // Exclude pivot table attributes
+        through: { attributes: [] },
       },
     ],
   });
@@ -76,17 +76,13 @@ exports.login = asyncHandler(async ({ email, password }) => {
   const accessToken = generateAccessToken({
     id: user.id,
     email: user.email,
-    roles: user.Roles.map((role) => role.name), // Include roles in token payload
+    roles: user.Roles.map((role) => role.name), // ini
   });
   const refreshToken = generateRefreshToken(user.id);
 
   return {
     user: {
-      id: user.id,
       name: user.name,
-      email: user.email,
-      emailVerifiedAt: user.emailVerifiedAt,
-      roles: user.Roles.map((role) => ({ id: role.id, name: role.name })),
     },
     accessToken,
     refreshToken,
@@ -207,5 +203,11 @@ exports.refreshToken = asyncHandler(async (refreshToken) => {
   });
   const newRefreshToken = generateRefreshToken(user.id);
 
-  return { user, accessToken: newAccessToken, refreshToken: newRefreshToken };
+  return {
+    user: {
+      name: user.name,
+    },
+    accessToken: newAccessToken,
+    refreshToken: newRefreshToken,
+  };
 });

@@ -54,7 +54,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    // Delete admin user and their role assignments
     await queryInterface.bulkDelete(
       "user_roles",
       {

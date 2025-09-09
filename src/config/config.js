@@ -1,4 +1,10 @@
 require("dotenv").config();
+
+/**
+ * Konfigurasi database untuk Sequelize
+ * Menggunakan environment variables untuk fleksibilitas
+ * Pastikan variabel lingkungan sudah diatur di file .env
+ */
 module.exports = {
   development: {
     username: process.env.DB_USERNAME,
