@@ -1,21 +1,30 @@
 {
   "name": "express-starter",
   "version": "1.0.0",
-  "description": "",
+  "description": "A starter template for building Express.js applications",
   "main": "src/server.js",
   "scripts": {
+    "test": "jest",
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "db:migrate": "sequelize db:migrate",
-    "db:migrate:undo": "sequelize db:migrate:undo",
-    "db:migrate:undo:all": "sequelize db:migrate:undo:all",
-    "db:seed": "sequelize db:seed:all",
-    "db:seed:undo": "sequelize db:seed:undo",
-    "db:seed:undo:all": "sequelize db:seed:undo:all"
+    "model:create": "sequelize model:generate --name",
+    "migration:create": "sequelize migration:generate --name",
+    "seeder:create": "sequelize seed:generate --name",
+    "migrate": "sequelize db:migrate",
+    "migrate:undo": "sequelize db:migrate:undo",
+    "migrate:undo:all": "sequelize db:migrate:undo:all",
+    "migrate:fresh": "npm run migrate:undo:all && npm run migrate",
+    "migrate:refresh": "npm run migrate:undo:all && npm run migrate && npm run seed",
+    "seed": "sequelize db:seed:all",
+    "seed:undo": "sequelize db:seed:undo",
+    "seed:undo:all": "sequelize db:seed:undo:all",
+    "seed:fresh": "npm run seed:undo:all && npm run seed",
+    "db:reset": "npm run migrate:undo:all && npm run migrate && npm run seed",
+    "db:setup": "npm run migrate && npm run seed"
   },
   "keywords": [],
-  "author": "brynnnn12",
-  "license": "BORJAN",
+  "author": "Bryan Kurnia Akbar",
+  "license": "brynnnn12",
   "type": "commonjs",
   "dependencies": {
     "bcryptjs": "^3.0.2",
@@ -33,8 +42,10 @@
     "uuid": "^12.0.0"
   },
   "devDependencies": {
+    "jest": "^30.1.3",
     "morgan": "^1.10.1",
     "nodemon": "^3.1.10",
-    "sequelize-cli": "^6.6.3"
+    "sequelize-cli": "^6.6.3",
+    "supertest": "^7.1.4"
   }
 }
