@@ -1,5 +1,5 @@
 const asyncHandler = require("express-async-handler");
-const { User } = require("../models");
+const { User, Role } = require("../models");
 const {
   generateAccessToken,
   verifyAccessToken,
@@ -25,6 +25,13 @@ exports.register = asyncHandler(
 
     const user = await User.create({ name, email, password });
 
+    const userRole = await Role.findOne({ where: { name: "User" } });
+    if (userRole) {
+      await user.addRole(userRole);
+    } else {
+      throw new Error("Role 'User' tidak ditemukan di database");
+    }
+
     const token = generateAccessToken({ id: user.id, email: user.email });
 
     const verifyUrl = `${
@@ -49,7 +56,15 @@ exports.register = asyncHandler(
 );
 
 exports.login = asyncHandler(async ({ email, password }) => {
-  const user = await User.findOne({ where: { email } });
+  const user = await User.findOne({
+    where: { email },
+    include: [
+      {
+        model: Role,
+        through: { attributes: [] }, // Exclude pivot table attributes
+      },
+    ],
+  });
 
   if (!user || !(await user.comparePassword(password))) {
     throw new Error("Email atau password salah");
@@ -57,10 +72,25 @@ exports.login = asyncHandler(async ({ email, password }) => {
   if (!user.emailVerifiedAt) {
     throw new Error("Email belum diverifikasi");
   }
-  const accessToken = generateAccessToken({ id: user.id, email: user.email });
+
+  const accessToken = generateAccessToken({
+    id: user.id,
+    email: user.email,
+    roles: user.Roles.map((role) => role.name), // Include roles in token payload
+  });
   const refreshToken = generateRefreshToken(user.id);
 
-  return { user, accessToken, refreshToken };
+  return {
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      emailVerifiedAt: user.emailVerifiedAt,
+      roles: user.Roles.map((role) => ({ id: role.id, name: role.name })),
+    },
+    accessToken,
+    refreshToken,
+  };
 });
 
 exports.logout = asyncHandler(async (user) => {
@@ -86,7 +116,7 @@ exports.verifyEmail = asyncHandler(async (token) => {
   // Kirim welcome email setelah verifikasi berhasil
   const welcomeTemplate = createWelcomeEmailTemplate({
     userName: user.name,
-    dashboardUrl: `${process.env.APP_URL || "http://localhost:3000"}/dashboard`,
+    dashboardUrl: process.env.APP_URL || "http://localhost:3000",
   });
 
   await sendEmail({

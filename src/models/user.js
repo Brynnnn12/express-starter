@@ -9,7 +9,12 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      // models/user.js
+      User.belongsToMany(models.Role, {
+        through: "user_roles",
+        foreignKey: "user_id",
+        otherKey: "role_id",
+      });
     }
   }
   User.init(
@@ -62,6 +67,7 @@ module.exports = (sequelize, DataTypes) => {
       emailVerifiedAt: {
         type: DataTypes.DATE,
         field: "email_verified_at",
+        allowNull: true,
       },
     },
     {
@@ -80,8 +86,6 @@ module.exports = (sequelize, DataTypes) => {
       sequelize,
       modelName: "User",
       tableName: "users",
-      underscored: true,
-      freezeTableName: true,
     }
   );
   User.prototype.comparePassword = async function (password) {
